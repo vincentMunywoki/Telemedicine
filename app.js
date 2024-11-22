@@ -174,6 +174,8 @@ const bcrypt = require('bcrypt');
 
 // Import routers
 const patientRouter = require('./routes/patientRouter');
+const doctorRouter = require('./routes/doctorRouter');
+const appointmentRouter = require('./routes/appointmentRouter');
 
 // Initialization
 const app = express();
@@ -198,6 +200,10 @@ app.use(session({
 // Serve the main page
 app.get('/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/doctor.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'doctor.html'));
 });
 
 // Assume the 'patients' array is a placeholder for a DB in this demo
@@ -329,11 +335,131 @@ app.post('/telemedicine/api/patients/logout', (req, res) => {
     });
 });
 
+// Doctor registration route
+app.post('/telemedicine/api/doctors/register', (req, res) => {
+    const { first_name, last_name, email, phone, specialization, schedule, password } = req.body;
+
+    if (!first_name || !last_name || !email || !phone || !specialization || !schedule || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Simulating doctor registration (store in an array or database)
+    const newDoctor = {
+        first_name,
+        last_name,
+        email,
+        phone,
+        specialization,
+        schedule,
+        password // In a real app, use hashing for password
+    };
+
+    // Save the new doctor to the database or in-memory store
+    doctors.push(newDoctor); // Assume doctors is your in-memory array or database model
+
+    res.status(201).json({ message: 'Doctor created successfully', doctor: newDoctor });
+});
+
+// Doctor login route
+app.post('/telemedicine/api/doctors/login', (req, res) => {
+    const { email, password } = req.body;
+
+    // Find the doctor by email
+    const doctor = doctors.find(d => d.email === email);
+
+    if (!doctor) {
+        return res.status(400).json({ error: 'Doctor not found' });
+    }
+
+    // Check if the password matches
+    if (doctor.password !== password) {
+        return res.status(400).json({ error: 'Invalid password' });
+    }
+
+    // If successful, send back the doctor info
+    res.status(200).json({ message: 'Login successful', doctor });
+});
+
+// Route for fetching doctors
+app.get('/telemedicine/api/doctors', (req, res) => {
+    const doctors = [
+        { id: 1, name: 'Dr. John Doe', specialization: 'Dermatologist' },
+        { id: 2, name: 'Dr. Joy Muthoni', specialization: 'Cardiologist' },
+        { id: 3, name: 'Dr. Sharon Shay ', specialization: 'cardiologist' },
+   
+    ];  // Simulated doctor data (In a real app, this will come from a database)
+
+    res.json(doctors);  // Send back the list of doctors as JSON
+});
+
+//backend route to get doctors for patients
+app.get('/telemedicine/api/doctors', (req, res) => {
+    // Return a list of doctors with their id, name, and specialization
+    const doctorList = doctors.map(d => ({
+        id: d.email,  // Use email as doctor ID (or create a unique id for doctors)
+        name: `${d.first_name} ${d.last_name}`,
+        specialization: d.specialization
+    }));
+    res.status(200).json(doctorList);
+});
+
+
+let appointments = [];
+
+// Example endpoint to get doctors for the dropdown
+app.get('/telemedicine/api/doctors', (req, res) => {
+    res.json(doctors);
+});
+
+
+//Delete Appointment
+app.delete('/telemedicine/api/appointments/:id', (req, res) => {
+    const appointmentId = parseInt(req.params.id);
+    const index = appointments.findIndex(appointment => appointment.id === appointmentId);
+    
+    if (index !== -1) {
+        appointments.splice(index, 1);
+        return res.status(200).json({ message: 'Appointment deleted successfully' });
+    } else {
+        return res.status(404).json({ message: 'Appointment not found' });
+    }
+});
+
+// 3. Reschedule Appointment
+app.put('/telemedicine/api/appointments/:id', (req, res) => {
+    const appointmentId = parseInt(req.params.id);
+    const { appointment_date, appointment_time } = req.body;
+    
+    const appointment = appointments.find(a => a.id === appointmentId);
+    
+    if (appointment) {
+        appointment.appointment_date = appointment_date;
+        appointment.appointment_time = appointment_time;
+        return res.status(200).json(appointment);
+    } else {
+        return res.status(404).json({ message: 'Appointment not found' });
+    }
+});
+
+// Route for doctor to get their appointments
+app.get('/telemedicine/api/doctors/:email/appointments', (req, res) => {
+    const { email } = req.params;
+
+    // Filter appointments for the doctor
+    const doctorAppointments = appointments.filter(a => a.doctor_id === email);
+    
+    res.status(200).json({ appointments: doctorAppointments });
+});
+
 // Use existing routers for other functionalities
 app.use('/telemedicine/api/patients', patientRouter);
+app.use('/telemedicine/api/doctors', doctorRouter);
+app.use('/telemedicine/api/', appointmentRouter);
 
 // Serve additional HTML pages
 app.get('/patient.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'patient.html')));
+app.get('/doctor.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'doctor.html')));
+app.get('/appointment.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'appointment.html')));
 
 // Define a port
 const PORT = 2022;

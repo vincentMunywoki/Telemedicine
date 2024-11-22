@@ -1,0 +1,278 @@
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleMed | Doctor Management</title>
+    <link rel="stylesheet" href="/css/styles/doctor-style.css">
+</head>
+<body>
+
+    <header class="page-header">
+        <h1>TeleMed - Doctor Management</h1>
+    </header>
+
+    <main>
+        <!-- Create Doctor Form Section -->
+        <!-- <section class="form-section">
+            <h2>Create Doctor</h2>
+            <form id="create-doctor-form" class="doctor-form">
+                <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="specialization">Specialization:</label>
+                    <input type="text" id="specialization" name="specialization" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="schedule">Schedule:</label>
+                    <textarea id="schedule" name="schedule" rows="4" placeholder="Enter schedule details"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Create Doctor</button>
+            </form>
+            <div id="doctor-message"></div>
+        </section> --> -->
+
+        <!-- Doctors List Section -->
+        <!-- <section class="doctors-list-section">
+            <h2>Doctors List</h2>
+            <div id="doctors-list" class="doctors-list"></div>
+        </section>
+    </main>
+
+    <script src="/js/scripts.js"></script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeleMed | Doctor Management</title>
+    <link rel="stylesheet" href="/css/styles/doctor-style.css">
+</head>
+<body>
+
+    <header class="page-header">
+        <h1>TeleMed - Doctor Management</h1>
+    
+    </header>
+
+    <main>
+        <!-- Create Doctor Form Section -->
+        <section class="form-section">
+            <h2>Create Doctor</h2>
+            <form id="doctor-registration-form" class="doctor-form">
+                <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="specialization">Specialization:</label>
+                    <!-- A dropdown for doctors to select their specialty -->
+                    <select id="specialization" name="specialization" required>
+                        <option value="" disabled selected>Select your specialization</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Psychiatry">Psychiatry</option>
+                        <!-- Add more specialties as needed -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="schedule">Schedule:</label>
+                    <textarea id="schedule" name="schedule" rows="4" placeholder="Enter schedule details" required></textarea>
+
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="submit-btn">Create Doctor</button>
+            </form>
+            <div class="login-link">
+                <p>Already registered? <a href="doctor-login.html">Log in here</a></p>
+            </div>
+            <div id="doctor-message"></div>
+        </section>
+
+        <!-- Doctors List Section -->
+        <h2>Your Appointments</h2>
+    <div id="appointments-list"></div>
+
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+    // Get the doctor creation form
+    const form = document.getElementById('doctor-registration-form');
+    const doctorMessageDiv = document.getElementById('doctor-message');
+
+    // Handle form submission
+    doctorForm.addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Collect form data
+        const firstName = document.getElementById('first_name').value;
+        const lastName = document.getElementById('last_name').value;
+        const specialization = document.getElementById('specialization').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const schedule = document.getElementById('schedule').value;
+        const  password = document.getElementById('password').value;
+        try {
+            // Send the data to the server
+            const response = await fetch('/telemedicine/api/doctors/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    specialization: specialization,
+                    email: email,
+                    phone: phone,
+                    schedule: schedule,
+                    password: password
+                })
+            });
+
+            const data = await response.json();
+
+            // Display success or error message
+            if (response.ok) {
+                doctorMessageDiv.classList.remove('alert-danger');
+                doctorMessageDiv.classList.add('alert-success');
+                doctorMessageDiv.textContent = data.message || 'Doctor created successfully.';
+                doctorMessageDiv.style.display = 'block';
+                // Optionally reset the form
+                doctorForm.reset();
+                window.location.href = '/doctor-login.html';
+
+            } else {
+                doctorMessageDiv.classList.remove('alert-success');
+                doctorMessageDiv.classList.add('alert-danger');
+                doctorMessageDiv.textContent = data.error || 'Failed to create doctor.';
+                doctorMessageDiv.style.display = 'block';
+            }
+
+        } catch (error) {
+            console.error('Error creating doctor:', error);
+            doctorMessageDiv.classList.remove('alert-success');
+            doctorMessageDiv.classList.add('alert-danger');
+            doctorMessageDiv.textContent = 'Failed to create doctor due to a server error.';
+            doctorMessageDiv.style.display = 'block';
+        }
+    });
+
+    // You can add logic for fetching the doctor list or other features here if needed.
+});
+
+// In scripts.js
+
+// Get doctor appointments
+async function fetchAppointments() {
+    const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage after login
+
+    try {
+        const response = await fetch('/telemedicine/api/doctors/appointments', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch appointments');
+        }
+
+        const appointments = await response.json();
+        const appointmentsList = document.getElementById('appointments-list');
+        appointmentsList.innerHTML = '';
+
+        appointments.forEach(appointment => {
+            const appointmentDiv = document.createElement('div');
+            appointmentDiv.innerHTML = `
+                <p>Patient: ${appointment.patient_name}, Date: ${appointment.appointment_date}, Time: ${appointment.appointment_time}</p>
+                <button onclick="deleteAppointment(${appointment.id})">Delete Appointment</button>
+            `;
+            appointmentsList.appendChild(appointmentDiv);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Delete appointment
+async function deleteAppointment(appointmentId) {
+    const token = localStorage.getItem('token'); // Get token from localStorage
+
+    try {
+        const response = await fetch(`/telemedicine/api/doctors/appointments/${appointmentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (response.ok) {
+            alert('Appointment deleted');
+            fetchAppointments(); // Refresh the appointment list
+        } else {
+            alert('Error deleting appointment');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Handle logout
+document.getElementById('logoutButton').addEventListener('click', () => {
+    // Make an API call to clear the session or token
+    fetch('/api/logout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(() => {
+            // Redirect to the main page
+            window.location.href = '/index.html';
+        })
+        .catch((error) => {
+            console.error('Error logging out:', error);
+        });
+});
+
+// Fetch appointments when the page loads
+fetchAppointments();
+
+  
+    </script>
+</body>
+</html>

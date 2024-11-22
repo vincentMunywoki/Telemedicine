@@ -16,14 +16,15 @@ exports.createAppointment = async (req, res) => {
     }
 
     // Insert the new appointment into the database
-    const [result] = await db.execute('INSERT INTO appointments (patient_name, doctor_id, appointment_date, appointment_time, status) VALUES (?, ?, ?, ?, ?)', 
-                                       [patient_name, doctor_id, appointment_date, appointment_time, status]);
+    const [result] = await db.execute('INSERT INTO appointments (patient_name, doctor_id, appointment_date, appointment_time, status) VALUES ( ?, ?, ?, ?, ?)', 
+                                       [ patient_name, doctor_id, appointment_date, appointment_time, status]);
 
     // Respond with success message and appointment details
     res.status(201).json({
       message: 'Appointment booked successfully',
       appointment: {
         id: result.insertId,
+        // patient_id,
         patient_name,
         doctor_id,
         appointment_date,
@@ -119,3 +120,82 @@ exports.cancelAppointment = async (req, res) => {
     res.status(500).json({ message: 'Error canceling appointment', error });
   }
 };
+// Create a new appointment
+// exports.createAppointment = (req, res) => {
+//     const { patient_name, doctor_id, appointment_date, appointment_time } = req.body;
+
+//     if (!patient_name || !doctor_id || !appointment_date || !appointment_time) {
+//         return res.status(400).json({ message: 'All fields are required!' });
+//     }
+
+//     const query = 'INSERT INTO appointments (patient_name, doctor_id, appointment_date, appointment_time, status) VALUES (?, ?, ?, ?, "scheduled")';
+//     db.execute(query, [patient_name, doctor_id, appointment_date, appointment_time], (error, results) => {
+//         if (error) {
+//             return res.status(500).json({ message: 'Error creating appointment', error });
+//         }
+//         res.status(201).json({ message: 'Appointment booked successfully', appointment: results.insertId });
+//     });
+// };
+
+// // Get appointments by patient
+// exports.getAppointmentsByPatient = (req, res) => {
+//     const patient_id = req.query.patient_id; // Assuming patient_id is passed in query params
+
+//     const query = 'SELECT * FROM appointments WHERE patient_id = ?';
+//     db.execute(query, [patient_id], (error, results) => {
+//         if (error) {
+//             return res.status(500).json({ message: 'Error fetching appointments', error });
+//         }
+//         res.status(200).json({ appointments: results });
+//     });
+// };
+
+// // Get appointments by doctor
+// exports.getAppointmentsByDoctor = (req, res) => {
+//     const doctor_id = req.params.doctor_id;
+
+//     const query = 'SELECT * FROM appointments WHERE doctor_id = ?';
+//     db.execute(query, [doctor_id], (error, results) => {
+//         if (error) {
+//             return res.status(500).json({ message: 'Error fetching appointments', error });
+//         }
+//         res.status(200).json({ appointments: results });
+//     });
+// };
+
+// // Update an appointment (reschedule)
+// exports.updateAppointment = (req, res) => {
+//     const { appointment_id } = req.params;
+//     const { appointment_date, appointment_time } = req.body;
+
+//     if (!appointment_date || !appointment_time) {
+//         return res.status(400).json({ message: 'Appointment date and time are required' });
+//     }
+
+//     const query = 'UPDATE appointments SET appointment_date = ?, appointment_time = ? WHERE id = ?';
+//     db.execute(query, [appointment_date, appointment_time, appointment_id], (error, results) => {
+//         if (error) {
+//             return res.status(500).json({ message: 'Error updating appointment', error });
+//         }
+//         if (results.affectedRows === 0) {
+//             return res.status(404).json({ message: 'Appointment not found' });
+//         }
+//         res.status(200).json({ message: 'Appointment rescheduled successfully' });
+//     });
+// };
+
+// // Cancel an appointment (delete)
+// exports.cancelAppointment = (req, res) => {
+//     const { appointment_id } = req.params;
+
+//     const query = 'DELETE FROM appointments WHERE id = ?';
+//     db.execute(query, [appointment_id], (error, results) => {
+//         if (error) {
+//             return res.status(500).json({ message: 'Error deleting appointment', error });
+//         }
+//         if (results.affectedRows === 0) {
+//             return res.status(404).json({ message: 'Appointment not found' });
+//         }
+//         res.status(200).json({ message: 'Appointment deleted successfully' });
+//     });
+// };

@@ -1,0 +1,114 @@
+<!-- doctor-dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - TeleHealth</title>
+  
+
+        <!-- Logout button -->
+        <button id="logout-btn" class="btn btn-danger">Logout</button>
+        
+        <!-- Account Deletion -->
+        <button id="delete-account-btn" class="btn btn-danger">Delete Account</button>
+
+</head>
+<body>
+    <h5>Patient Appointments</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Patient Name</th>
+                <th>Appointment Date</th>
+                <th>Appointment Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody id="appointments-list">
+            <!-- Dynamic content will be inserted here -->
+        </tbody>
+        </table>
+    <script> 
+        document.addEventListener('DOMContentLoaded', () => {
+    const logoutButton = document.getElementById('logout-btn');
+    const deleteAccountButton = document.getElementById('delete-account-btn');
+    const appointmentsList = document.getElementById('appointments-list');
+    const doctorId = localStorage.getItem('doctor_id');
+
+    // Logout functionality
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            // Clear any stored doctor data from localStorage
+            localStorage.removeItem('doctor_id');
+            localStorage.removeItem('doctor_email');
+
+            // Redirect to login page
+            window.location.href = 'doctor-login.html';
+        });
+    }
+
+    // Delete Account functionality
+    if (deleteAccountButton) {
+        deleteAccountButton.addEventListener('click', async () => {
+          
+            const doctorId = localStorage.getItem('doctor_id');
+            console.log("Doctor ID retrieved:", doctorId);
+
+            if (doctorId) {
+                try {
+                    const response = await fetch(`/api/doctor/${doctorId}`, {
+                        method: 'DELETE',
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        // Show success message and log the doctor out
+                        alert(data.message || "Account deleted successfully.");
+                        localStorage.removeItem('doctor_id');
+                        window.location.href = 'doctor-login.html';  // Redirect to login page
+                    } else {
+                        alert(data.message || "Failed to delete account.");
+                    }
+                } catch (error) {
+                    console.error('Error deleting account:', error);
+                    alert('No doctor ID found in local storage.');
+                }
+            }
+        });
+    }
+
+    // Load doctor appointments
+    const loadAppointments = async () => {
+        try {
+            const response = await fetch(`/api/doctor/${doctorId}/appointments`);
+            const appointments = await response.json();
+
+            if (appointments.length > 0) {
+                appointments.forEach(appointment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${appointment.patient_name}</td>
+                        <td>${appointment.appointment_date}</td>
+                        <td>${appointment.appointment_time}</td>
+                        <td>${appointment.status}</td>
+                    `;
+                    appointmentsList.appendChild(row);
+                });
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="4">No appointments found.</td>`;
+                appointmentsList.appendChild(row);
+            }
+        } catch (error) {
+            console.error('Error loading appointments:', error);
+        }
+    };
+
+    loadAppointments();  // Load appointments on page load
+});
+
+    </script>
+</body>
+</html>
