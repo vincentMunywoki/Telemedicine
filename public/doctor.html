@@ -112,7 +112,7 @@
                     <textarea id="schedule" name="schedule" rows="4" placeholder="Enter schedule details" required></textarea>
 
                     <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" autocomplete ='current-password'required>
                 </div>
                 <button type="submit" class="submit-btn">Create Doctor</button>
             </form>
@@ -133,9 +133,8 @@
     // Get the doctor creation form
     const form = document.getElementById('doctor-registration-form');
     const doctorMessageDiv = document.getElementById('doctor-message');
-
     // Handle form submission
-    doctorForm.addEventListener('submit', async function(event) {
+    form.addEventListener('submit', async function(event) {
         event.preventDefault(); // Prevent the default form submission
 
         // Collect form data
@@ -171,7 +170,7 @@
                 doctorMessageDiv.textContent = data.message || 'Doctor created successfully.';
                 doctorMessageDiv.style.display = 'block';
                 // Optionally reset the form
-                doctorForm.reset();
+                form.reset();
                 window.location.href = '/doctor-login.html';
 
             } else {

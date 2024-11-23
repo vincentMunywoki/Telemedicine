@@ -50,7 +50,7 @@ exports.addDoctor = async (req, res) => {
     }
 };
 
-// Get all doctors with specialization and availability
+//Get all doctors with specialization and availability
 exports.getAllDoctors = async (req, res) => {
     try {
         const [doctors] = await db.execute('SELECT * FROM doctors');
@@ -60,6 +60,17 @@ exports.getAllDoctors = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving doctors', error: error.message });
     }
 };
+// doctorController.js
+// exports.getAllDoctors = async (req, res) => {
+//     try {
+//         const [doctors] = await db.execute('SELECT id, first_name, last_name, specialization FROM doctors');
+//         res.status(200).json(doctors);
+//     } catch (error) {
+//         console.error('Error retrieving doctors:', error);
+//         res.status(500).json({ message: 'Error retrieving doctors', error: error.message });
+//     }
+// };
+
 
 // Update doctor's profile or schedule
 exports.updateDoctor = async (req, res) => {

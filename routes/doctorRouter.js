@@ -2,6 +2,7 @@ const express = require('express');
 const doctorController = require('../controllers/doctorController');
 const authMiddleware = require('../middleware/authMiddleware'); // Import authMiddleware
 const router = express.Router();
+
 const { deleteDoctor, getDoctorAppointments } = require('../controllers/doctorController');
 
 
@@ -33,3 +34,36 @@ router.get('/appointments', authMiddleware.verifyToken, doctorController.getDoct
 router.delete('/appointments/:appointmentId', authMiddleware.verifyToken, doctorController.deleteAppointment);
 
 module.exports = router;
+// const express = require('express');
+// const doctorController = require('../controllers/doctorController');
+// const authMiddleware = require('../middleware/authMiddleware');
+// const router = express.Router();
+
+// // Import specific functions if not using `doctorController` directly
+// const { deleteDoctor, getDoctorAppointments } = doctorController;
+
+// // Doctor registration and login
+// router.post('/create', doctorController.addDoctor);
+// router.post('/login', doctorController.loginDoctor);
+
+// // Get all doctors - used for populating dropdown in appointments
+// router.get('/', async (req, res) => {
+//     try {
+//         const doctors = await doctorController.getAllDoctors();
+//         res.json(doctors);
+//     } catch (error) {
+//         res.status(500).json({ error: 'Failed to fetch doctors' });
+//     }
+// });
+
+// // Doctor-specific routes
+// router.put('/:id', doctorController.updateDoctor);                // Update doctor profile or schedule
+// router.delete('/:id', authMiddleware.verifyToken, deleteDoctor);  // Delete doctor (Admin only)
+
+// // Get doctor appointments (requires authentication)
+// router.get('/:id/appointments', authMiddleware.verifyToken, getDoctorAppointments);
+
+// // Delete an appointment (requires authentication)
+// router.delete('/appointments/:appointmentId', authMiddleware.verifyToken, doctorController.deleteAppointment);
+
+// module.exports = router;

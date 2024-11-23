@@ -74,52 +74,61 @@ exports.getAppointmentsByDoctor = async (req, res) => {
 
 
 exports.updateAppointment = async (req, res) => {
-  try {
-    const { appointment_id } = req.params;
-    const { newDate, newTime } = req.body;
+    const appointmentId = req.params.appointment_id;
+    const { appointment_date, appointment_time } = req.body;
 
-    if (!newDate || !newTime) {
-      return res.status(400).json({ message: 'Both new date and time are required' });
+    if (!appointmentId || !appointment_date || !appointment_time) {
+        return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // Check if the appointment exists
-    const [existingAppointment] = await db.execute('SELECT * FROM appointments WHERE id = ?', [appointment_id]);
-    if (existingAppointment.length === 0) {
-      return res.status(404).json({ message: 'Appointment not found' });
+    try {
+        // Find the appointment by ID
+        const appointment = await Appointment.findById(appointmentId);
+
+        if (!appointment) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+
+        // Update the appointment details
+        appointment.appointment_date = appointment_date;
+        appointment.appointment_time = appointment_time;
+
+        // Save the updated appointment
+        await appointment.save();
+
+        res.status(200).json({ message: 'Appointment updated successfully', appointment });
+    } catch (error) {
+        console.error('Error updating appointment:', error);
+        res.status(500).json({ message: 'Server error while updating appointment' });
     }
-
-    // Update the appointment
-    const query = 'UPDATE appointments SET appointment_date = ?, appointment_time = ? WHERE id = ?';
-    await db.execute(query, [newDate, newTime, appointment_id]);
-
-    res.json({ message: 'Appointment rescheduled successfully' });
-  } catch (error) {
-    console.error('Error rescheduling appointment:', error);
-    res.status(500).json({ message: 'Error rescheduling appointment', error });
-  }
 };
 
 
+// In appointmentController.js
 exports.cancelAppointment = async (req, res) => {
-  try {
-    const { appointment_id } = req.params;
+    const appointmentId = req.params.appointment_id; // Get the appointment ID from the URL parameter
 
-    // Check if the appointment exists
-    const [existingAppointment] = await db.execute('SELECT * FROM appointments WHERE id = ?', [appointment_id]);
-    if (existingAppointment.length === 0) {
-      return res.status(404).json({ message: 'Appointment not found' });
+    if (!appointmentId) {
+        return res.status(400).json({ message: 'Appointment ID is required' });
     }
 
-    // Delete the appointment
-    const query = 'DELETE FROM appointments WHERE id = ?';
-    await db.execute(query, [appointment_id]);
+    try {
+        // Using MySQL to delete the appointment
+        const [result] = await db.query('DELETE FROM appointments WHERE id = ?', [appointmentId]);
 
-    res.json({ message: 'Appointment canceled successfully' });
-  } catch (error) {
-    console.error('Error canceling appointment:', error);
-    res.status(500).json({ message: 'Error canceling appointment', error });
-  }
+        // Check if the appointment was found and deleted
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+
+        return res.status(200).json({ message: 'Appointment deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting appointment:', error);
+        return res.status(500).json({ message: 'Failed to delete appointment' });
+    }
 };
+
+
 // Create a new appointment
 // exports.createAppointment = (req, res) => {
 //     const { patient_name, doctor_id, appointment_date, appointment_time } = req.body;
