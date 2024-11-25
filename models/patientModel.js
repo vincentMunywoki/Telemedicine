@@ -50,7 +50,7 @@
 //   insertPatient,
 //   getAllPatients,
 //   updatePatientById,
-//   deletePatientById,
+//   deletePatientById,,
 // };
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
