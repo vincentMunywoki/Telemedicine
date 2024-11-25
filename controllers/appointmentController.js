@@ -127,8 +127,6 @@ exports.cancelAppointment = async (req, res) => {
         return res.status(500).json({ message: 'Failed to delete appointment' });
     }
 };
-
-
 // Create a new appointment
 // exports.createAppointment = (req, res) => {
 //     const { patient_name, doctor_id, appointment_date, appointment_time } = req.body;
