@@ -70,24 +70,24 @@
 //         address,
 //     };
 
-    // Save new patient to the "database" (here, it's just an array in memory)
-    patients.push(newPatient);
+//     // Save new patient to the "database" (here, it's just an array in memory)
+//     patients.push(newPatient);
 
-    // Optionally, set a session to mock user authentication
-    req.session.patient = { firstName: first_name, lastName: last_name, email };
+//     // Optionally, set a session to mock user authentication
+//     req.session.patient = { firstName: first_name, lastName: last_name, email };
 
-    // Respond with success and the newly created patient data
-    res.status(201).json({
-        message: 'Patient created successfully',
-        patient: {
-            firstName: first_name,
-            lastName: last_name,
-            email,
-            phone,
-            dateOfBirth: date_of_birth,
-            gender,
-            address
-        }
+//     // Respond with success and the newly created patient data
+//     res.status(201).json({
+//         message: 'Patient created successfully',
+//         patient: {
+//             firstName: first_name,
+//             lastName: last_name,
+//             email,
+//             phone,
+//             dateOfBirth: date_of_birth,
+//             gender,
+//             address
+//         }
 //     });
 // });
 
